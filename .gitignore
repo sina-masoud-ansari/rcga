@@ -53,10 +53,10 @@ coverage.xml
 docs/_build/
 
 # Data and pickles
-./ready
-./data
-./close
-./papers
-./pops
+ready/
+data/
+close/
+papers/
+pops/
 *.p
 *.zip
