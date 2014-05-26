@@ -1,0 +1,5 @@
+error:
+
+    y_t = u[t-1] # teacher forcing output
+	IndexError: index out of bounds
+
