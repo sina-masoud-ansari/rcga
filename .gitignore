@@ -52,3 +52,11 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Data and pickles
+./ready
+./data
+./close
+./papers
+./pops
+*.p
+*.zip
