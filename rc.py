@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import multiprocessing
+from multiprocessing import Process, Queue
 
 class Util:
 	@staticmethod
@@ -52,6 +54,46 @@ class Util:
 			res.train(train)
 			e += res.test(s, len(train), plot=plot)
 		return e / len(samples)
+
+	@staticmethod
+	def validationMP_work(res, samples, forecast_length, queue):
+		error = 0.0
+		for s in samples:
+			train = s[:-forecast_length]
+			res.train(train)
+			error += res.test(s, len(train))
+		queue.put(error)
+
+	@staticmethod
+	def validationMP(res, samples, forecast_length, plot=False):
+		"""
+		Validation with multiprocessing support
+		"""
+		nproc = multiprocessing.cpu_count()
+		work_len = max(1, int(len(samples)/nproc))
+		work_items = []
+		for i in range(nproc):
+			w_start = i*work_len
+			w_end = min(i+1*work_len, len(samples))
+			w_item = samples[w_start:w_end]
+			if len(w_item) > 0:
+				work_items.append(w_item)
+				#print len(w_item)
+
+		queue = Queue()
+		errors = []
+		procs = []
+
+		for w_item in work_items:
+			p = Process(target=Util.validationMP_work, args=(res, w_item, forecast_length, queue))
+			p.start()
+			procs.append(p)
+		for p in procs:
+			errors.append(queue.get())
+		for p in procs:
+			p.join()
+
+		return np.mean(np.array(errors))
 
 	
 #	@staticmethod

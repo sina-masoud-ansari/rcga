@@ -80,7 +80,7 @@ def popToDescription(popv):
 	return [toDescription(p) for p in popv]
 
 def createReservoirs(n):
-	print "Creating initial population ... ",
+	print "Creating initial population of size {n} ...".format(n=n),
 	reservoirs = []
 	while len(reservoirs) < n:
 		try:
@@ -106,7 +106,7 @@ def reservoirFitness(desc, samples, forecast_length):
 		res = fromDescription(desc)
 	except ReservoirError:
 		return 0.0
-	mape = Util.validation(res, samples, forecast_length, plot=False)
+	mape = Util.validationMP(res, samples, forecast_length, plot=False)
 	# values close to zero have fitness near 1
 	#print mape, np.exp(-mape)
 	return np.exp(-mape)
@@ -192,6 +192,9 @@ def resume():
 
 
 def main():
+	# For reproducibilty, set seed
+	#np.random.seed(1)
+
 	# sample controls
 	sample_length = 200
 	forecast_length = 5
@@ -202,9 +205,10 @@ def main():
 	np.random.shuffle(samples)
 	test = samples[:n_test]
 	train = samples[n_test:]
+	print "Num train: {ntr}, Num test: {ntst}".format(ntr=len(train), ntst=len(test))
 
 	# create initial population
-	pop_size = 100
+	pop_size = 20
 	pop = createReservoirs(pop_size)
 	pop = popToDescription(pop)
 
@@ -229,13 +233,13 @@ def main():
 
 	# Start GA
 	N = 1
-	n = 50
+	n = 5
 	for i in range(0, N):
 		ga.run(n, checkpoint=True, checkperiod=5)
 		res = fromDescription(ga.best)
 		e_train = Util.validation(res, train, forecast_length, plot=False)
 		e_test = Util.validation(res, test, forecast_length, plot=False)
-		print "Train error: {tr}, Test error: {tst}".format(tr=e_train, tst=e_test)
+		print "MAPE: Train error: {tr}, Test error: {tst}".format(tr=e_train, tst=e_test)
 
 
 

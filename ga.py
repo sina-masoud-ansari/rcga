@@ -32,12 +32,13 @@ class GA:
 	def summary(self):
 		individuals, fitness = zip(*self.evaluateFitness())
 		median = np.median(fitness)
+		mean = np.mean(fitness)
 		best = np.amax(fitness)
 		index_best = fitness.index(best)
 		self.best = individuals[index_best]
 		#for i, f in fitness:
 		#	print f
-		print "best: {b}, median: {m}".format(b=best, m=median)
+		print "Best: {b}, Mean: {mn}, Median: {med}".format(b=best, mn=mean, med=median)
 
 	# Population modifiers
 	def addSpores(self, spores):
@@ -66,8 +67,8 @@ class GA:
 			print "Need to set up GA methods"
 			sys.exit(0)
 		
-		print "Start:"
-		self.summary()
+		#print "Start:"
+		#self.summary()
 
 		# Time independent selection and replacement groups
 		nparents = int(self.matingPoolRatio * len(self.pop)) # size of mating pool
@@ -75,6 +76,7 @@ class GA:
 		nreplace = int(self.replacementRatio * len(self.pop)) # number of original pop to replace
 
 		# Start loop
+		checkpointed = False
 		for i in range(0, n):
 			parents = self.selectParents(nparents)
 			children = self.createChildren(parents, nchildren)
@@ -82,17 +84,25 @@ class GA:
 			self.pop = self.replace(self.pop, parents, children, nreplace)
 
 			print "Generation: ", i+1
-			self.summary()
+			#self.summary()
 			if checkpoint:
 				if (i+1) % checkperiod == 0:
 					print "Checkpointing ... ",
 					self.save(checkfile)
 					print "done"
-		print "End"
-		self.summary()
-		print "Saving results ... ",
-		self.save(checkfile)
-		print "done"
+					print "Summary:"
+					self.summary()
+					checkpointed = True
+				else:
+					checkpointed = False
+		#print "End"
+		#self.summary()
+		if not checkpointed:
+			print "Summary:"
+			self.summary()
+			print "Saving results ... ",
+			self.save(checkfile)
+			print "done"
 
 
 	# Fitness
