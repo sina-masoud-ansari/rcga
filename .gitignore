@@ -53,6 +53,7 @@ coverage.xml
 docs/_build/
 
 # Data and pickles
+old/
 ready/
 data/
 close/

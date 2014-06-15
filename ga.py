@@ -30,15 +30,17 @@ class GA:
 
 	# Summary
 	def summary(self):
+		print "Fitness summary:"
 		individuals, fitness = zip(*self.evaluateFitness())
 		median = np.median(fitness)
 		mean = np.mean(fitness)
+		std = np.std(fitness)
 		best = np.amax(fitness)
 		index_best = fitness.index(best)
 		self.best = individuals[index_best]
 		#for i, f in fitness:
 		#	print f
-		print "Best: {b}, Mean: {mn}, Median: {med}".format(b=best, mn=mean, med=median)
+		print "Best: {b}, Mean: {mn}, STDEV: {std}, Median: {med}".format(b=best, mn=mean, std=std, med=median)
 
 	# Population modifiers
 	def addSpores(self, spores):
@@ -50,14 +52,14 @@ class GA:
 
 	# Control
 	@staticmethod
-	def load(filename="pop.p"):
+	def load(filename):
 		return pickle.load( open( filename, "rb" ) )
 
 	def save(self, filename):
 		pickle.dump(self.pop, open(filename, "wb"))
 
 
-	def run(self, n, checkpoint=True, checkperiod=1, checkfile="pop.p"):
+	def run(self, n, checkpoint=True, checkperiod=10, checkfile='output.p'):
 
 		if self.fitnessFunction == None \
 								or self.selectionMethod == None \
@@ -90,7 +92,6 @@ class GA:
 					print "Checkpointing ... ",
 					self.save(checkfile)
 					print "done"
-					print "Summary:"
 					self.summary()
 					checkpointed = True
 				else:
@@ -98,12 +99,11 @@ class GA:
 		#print "End"
 		#self.summary()
 		if not checkpointed:
-			print "Summary:"
 			self.summary()
-			print "Saving results ... ",
-			self.save(checkfile)
-			print "done"
-
+			if checkpoint:
+				print "Saving results ... ",
+				self.save(checkfile)
+				print "done"
 
 	# Fitness
 	def setFitnessFunction(self, f, *args, **kwargs):

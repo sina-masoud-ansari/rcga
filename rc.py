@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 import multiprocessing
 from multiprocessing import Process, Queue
+import random
 
 class Util:
 	@staticmethod
@@ -65,20 +66,22 @@ class Util:
 		queue.put(error)
 
 	@staticmethod
-	def validationMP(res, samples, forecast_length, plot=False):
+	def validationMP(res, samples, forecast_length):
 		"""
 		Validation with multiprocessing support
 		"""
 		nproc = multiprocessing.cpu_count()
 		work_len = max(1, int(len(samples)/nproc))
+		work_len_mod = len(samples) % nproc
 		work_items = []
 		for i in range(nproc):
-			w_start = i*work_len
-			w_end = min(i+1*work_len, len(samples))
+			w_start = i * work_len
+			w_end = (i + 1) * work_len
+			if i == (nproc - 1):
+				w_end = w_end + work_len_mod
 			w_item = samples[w_start:w_end]
 			if len(w_item) > 0:
 				work_items.append(w_item)
-				#print len(w_item)
 
 		queue = Queue()
 		errors = []
@@ -138,6 +141,27 @@ class Util:
 			samples.append(u[sample_start:sample_end])
 
 		return samples
+
+	@staticmethod
+	def createRandomSamples(u, train_length, test_length, nsamples):
+		samples = []
+
+		# divide input into n equal sized random overlapping segments
+		length = train_length + test_length
+		start_points = random.sample(range( len(u) - length), nsamples)
+		start_points = sorted(start_points)
+		#print start_points
+		
+		for p in start_points:
+			sample_start = p
+			sample_end = sample_start + length
+			samples.append(u[sample_start:sample_end])
+
+		return samples
+
+
+
+
 
 class ReservoirError(Exception):
 	def __init__(self, msg):

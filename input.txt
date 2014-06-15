@@ -1,3 +1,1 @@
 close/ANZ.AX.csv
-close/BLT.AX.csv
-close/SGN.AX.csv
