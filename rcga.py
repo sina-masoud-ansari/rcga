@@ -293,7 +293,7 @@ if __name__ == '__main__':
 	ga = init_ga(pop, train, options)
 	# Run GA
 	for i in range(options.validation_period):
-		ga.run(options.num_generations, options.checkpoint, options.checkpoint_period, checkfile)
+		ga.run(options.num_generations, checkpoint=options.checkpoint, checkperiod=options.checkpoint_period, checkfile=checkfile)
 		validate(ga, train, test, options)
 
 	# Save output files

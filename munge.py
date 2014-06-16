@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import sys
 import os
 from datetime import datetime
@@ -10,7 +8,7 @@ for r,d,f in os.walk(sys.argv[1]):
     for files in f:
         if files.endswith(".csv"):
 			fname = os.path.join(r,files)
-			print fname
+			#print fname
 			h = open(fname)
 			nlines = 0
 			for line in h:
@@ -45,7 +43,7 @@ for r,d,f in os.walk(sys.argv[1]):
 
 #print symbols.keys()
 for k in symbols.keys():
-	print k
+	#print k
 	f = open("ready/"+ k + ".csv", 'w')
 	f.write("Date,Open,High,Low,Close,Volume\n")
 	dates = symbols[k]
