@@ -28,6 +28,9 @@ class GA:
 		self.mutationMethod = None
 		self.replacementMethod = None
 
+		# Summary info
+		self.best = None
+
 	# Summary
 	def summary(self):
 		print "Fitness summary:"

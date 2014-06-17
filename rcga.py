@@ -233,10 +233,16 @@ def save(prefix, ga, train, test):
 	pickle.dump(train, open(train_file, "wb"))
 	pickle.dump(test, open(test_file, "wb"))
 
-def analyse(pop, samples, options):
+def analyse(ga, samples, options):
 	# find best
+	if ga.best == None:
+		ga.summary()
 	res = fromDescription(ga.best)
-	Util.validation(res, samples, options.forecast_length, plot=True)
+	error = Util.validation(res, samples, options.forecast_length, plot=False)
+	print "Best MAPE: Test error: {tst}".format(tst=error)
+	Util.validation(res, samples, options.forecast_length, plot=True) # TODO: This is a bit hacky
+	
+
 
 def parse_args():
 	parser = argparse.ArgumentParser(description="Reservoir Computing with Genetic Algorithm")
@@ -283,14 +289,15 @@ if __name__ == '__main__':
 		train = pickle.load( open( train_file, "rb" ) )
 		test = pickle.load( open( test_file, "rb" ) )
 
-	# If Analyse only (--analyse-output)
-	if args.analyse_output != '':
-		analyse(pop, test, options)	
-		sys.exit(0)
-
 	# Initialise GA
 	checkfile = '%s.p' % prefix
 	ga = init_ga(pop, train, options)
+
+	# If Analyse only (--analyse-output)
+	if args.analyse_output != '':
+		analyse(ga, test, options)	
+		sys.exit(0)
+
 	# Run GA
 	for i in range(options.validation_period):
 		ga.run(options.num_generations, checkpoint=options.checkpoint, checkperiod=options.checkpoint_period, checkfile=checkfile)
@@ -302,4 +309,4 @@ if __name__ == '__main__':
 
 	# Analyse if requried (-a)
 	if args.analyse:
-		analyse(pop, test, options)	
+		analyse(ga, test, options)	
